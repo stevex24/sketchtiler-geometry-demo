@@ -100,7 +100,7 @@ All geometry logic (snapping, triangulation, bounding boxes, donut detection, et
 
 Clone the repo:
 
-git clone https://github.com/USERNAME/sketchtiler-geometry-demo.git
+git clone https://github.com/stevex24/sketchtiler-geometry-demo.git
 cd sketchtiler-geometry-demo
 
 
