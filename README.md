@@ -23,10 +23,7 @@ The goal is to make geometry preprocessing transparent, interactive, and demo-re
 
 Once GitHub Pages is enabled, the live demo will be available at:
 
-https://USERNAME.github.io/sketchtiler-geometry-demo/
-
-
-(Replace USERNAME with your GitHub username.)
+https://stevex24.github.io/sketchtiler-geometry-demo/
 
 ✨ Features
 1. Freehand Polygon Input
