@@ -66,7 +66,21 @@ function polygonFromStroke(stroke, closeThreshold = 10) {
     v.push({ x: first.x, y: first.y });
   }
   if (v.length < 3) return null;
+
+  // Preserve first drawn point as anchor
+  const anchor = v[0];
+
   if (isClockwise(v)) v.reverse();
+
+  // Rotate so anchor is vertex 0 again after orientation fix
+  const idx = v.findIndex(p => p.x === anchor.x && p.y === anchor.y);
+  if (idx > 0) {
+    const body = v.slice(0, v.length - 1); // remove duplicate close point
+    const rotated = body.slice(idx).concat(body.slice(0, idx));
+    rotated.push(rotated[0]); // re-close
+    return { vertices: rotated };
+  }
+
   return { vertices: v };
 }
 
