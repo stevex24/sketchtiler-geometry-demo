@@ -39,9 +39,12 @@ function resetForModeChange(state, resetComputed) {
   resetComputed();
 }
 
-export function setupUI(state, { draw, resetComputed }) {
+export function setupUI(state, { draw, resetComputed, recompute }) {
   const modeSelect = document.getElementById("modeSelect");
   const clearBtn = document.getElementById("clearBtn");
+  const gridSizeSlider = document.getElementById("gridSize");
+  const gridSizeVal = document.getElementById("gridSizeVal");
+  const snapEnabledCb = document.getElementById("snapEnabled");
   const showRawCb = document.getElementById("showRaw");
   const showSnapCb = document.getElementById("showSnap");
   const showBoxesCb = document.getElementById("showBoxes");
@@ -62,6 +65,30 @@ export function setupUI(state, { draw, resetComputed }) {
     state.strokes = [];
     state.currentStroke = [];
     resetComputed();
+    draw();
+  });
+
+  // Snapping controls
+  // defaults (in case state was created without these fields)
+  if (typeof state.gridSize !== "number") state.gridSize = Number(gridSizeSlider.value);
+  if (typeof state.snapEnabled !== "boolean") state.snapEnabled = snapEnabledCb.checked;
+
+  gridSizeSlider.value = String(state.gridSize);
+  gridSizeVal.textContent = String(state.gridSize);
+  snapEnabledCb.checked = state.snapEnabled;
+
+  gridSizeSlider.addEventListener("input", () => {
+    state.gridSize = Number(gridSizeSlider.value);
+    gridSizeVal.textContent = String(state.gridSize);
+    resetComputed();
+    if (typeof recompute === "function") recompute();
+    draw();
+  });
+
+  snapEnabledCb.addEventListener("change", () => {
+    state.snapEnabled = snapEnabledCb.checked;
+    resetComputed();
+    if (typeof recompute === "function") recompute();
     draw();
   });
 

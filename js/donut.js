@@ -1,10 +1,10 @@
-import { polygonFromStroke, boundingBoxVertices, isRound, pointInPolygon, triCentroid } from './geometry.js';
+import { polygonFromStroke, boundingBoxVertices, isRound, pointInPolygon, triCentroid, signedArea } from './geometry.js';
 import { snapPolygonAxisAligned } from './snapping.js';
 import { earClipTriangulate } from './triangulation.js';
 
 // ===================== Donut Helpers =====================
 
-function classifyDonutFromStrokes(strokes) {
+function classifyDonutFromStrokes(strokes, { gridSize = 25, snapEnabled = true } = {}) {
   if (strokes.length < 1) return null;
   const polyA = polygonFromStroke(strokes[0]);
   if (!polyA) return null;
@@ -12,7 +12,7 @@ function classifyDonutFromStrokes(strokes) {
     // outer-only preview
     // ensure CCW
     if (signedArea(polyA.vertices) < 0) polyA.vertices.reverse();
-    const snappedOuter = snapPolygonAxisAligned(polyA);
+    const snappedOuter = snapEnabled ? snapPolygonAxisAligned(polyA, gridSize) : polyA;
     return {
       mode: "outer-only",
       outerRaw: polyA,
@@ -35,8 +35,8 @@ function classifyDonutFromStrokes(strokes) {
     if (signedArea(outerRaw.vertices) < 0) outerRaw.vertices.reverse();
     if (signedArea(innerRaw.vertices) > 0) innerRaw.vertices.reverse();
 
-    const snappedOuter = snapPolygonAxisAligned(outerRaw);
-    const snappedInner = snapPolygonAxisAligned(innerRaw);
+    const snappedOuter = snapEnabled ? snapPolygonAxisAligned(outerRaw, gridSize) : outerRaw;
+    const snappedInner = snapEnabled ? snapPolygonAxisAligned(innerRaw, gridSize) : innerRaw;
 
     return {
       mode: "full",

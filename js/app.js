@@ -27,6 +27,10 @@ const state = {
   mode: "l_rect",
   triMode: "wire", // "wire", "fill", "both"
 
+  // snapping controls
+  gridSize: 25,
+  snapEnabled: true,
+
   // toggles
   showRaw: true,
   showSnap: true,
@@ -86,6 +90,15 @@ function resetComputed() {
   state.donutCircleInner = null;
 }
 
+function recompute() {
+  // Re-run processing for the current mode using existing strokes.
+  if (state.mode === "donut_rect" || state.mode === "donut_tri") {
+    if (state.strokes.length > 0) processDonutStrokes();
+  } else {
+    if (state.strokes.length > 0) processSingleStroke();
+  }
+}
+
 function processSingleStroke() {
   resetComputed();
   const poly = polygonFromStroke(state.strokes[0]);
@@ -93,7 +106,7 @@ function processSingleStroke() {
 
   state.rawPoly = poly;
   state.concaveFlags = findConcaveVertices(poly);
-  const snapped = snapPolygonAxisAligned(poly);
+  const snapped = state.snapEnabled ? snapPolygonAxisAligned(poly, state.gridSize) : poly;
   state.snappedPoly = snapped;
   state.bigBox = boundingBoxVertices(snapped.vertices);
 
@@ -112,7 +125,10 @@ function processSingleStroke() {
 
 function processDonutStrokes() {
   resetComputed();
-  const result = classifyDonutFromStrokes(state.strokes);
+  const result = classifyDonutFromStrokes(state.strokes, {
+    gridSize: state.gridSize,
+    snapEnabled: state.snapEnabled
+  });
   if (!result) return;
 
   if (result.mode === "outer-only") {
@@ -194,7 +210,8 @@ resizeCanvas(canvas);
 
 setupUI(state, {
   draw,
-  resetComputed
+  resetComputed,
+  recompute
 });
 
 draw();
